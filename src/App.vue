@@ -1,14 +1,18 @@
 <template>
- <Home />
+  <!-- <Home /> -->
+  <!-- <Login/> -->
+  <router-view />
 </template>
 
 <script>
 // import HelloWorldVue from "./components/HelloWorld.vue";
-import Home from './views/home/Home.vue'
+// import Home from "./views/home/Home.vue";
+// import Login from "./views/login/Login.vue";
 export default {
   name: "App",
   components: {
-    Home
+    // Home,
+    // Login,
   },
 };
 </script>
