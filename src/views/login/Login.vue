@@ -7,13 +7,13 @@
     <div class="wrapper__input">
       <input
         class="wrapper__input__content"
-        v-model="data.mobile"
+        v-model="username"
         placeholder="请输入手机号"
       />
     </div>
     <div class="wrapper__input">
       <input
-        v-model="data.password"
+        v-model="password"
         type="password"
         class="wrapper__input__content wrapper__gotop"
         placeholder="请输入密码"
@@ -25,99 +25,75 @@
     <div class="wrapper__login-link wrapper__gotop" @click="handleRegister">
       立即注册
     </div>
-    <Toast :message="data.toastMessage" v-if="data.showToast" />
+    <Toast :message="toastMessage" v-if="show" />
   </div>
 </template>
 
 <script>
 // 登录之后进行路由跳转
 import { useRouter } from "vue-router";
-import { reactive } from "vue";
+import { reactive, toRefs } from "vue";
 // import axios from "axios";
 import { post } from "../../utils/request.js";
 //引入toast
-import Toast from "../../components/toast.vue";
+import Toast, { useToastEffect } from "../../components/toast.vue";
+
+const useLoginEffect = (showToast) => {
+  let data = reactive({
+    username: "",
+    password: "",
+  });
+  let router = useRouter();
+  const handleLogin = async () => {
+    // 加入try...catch，如果报错的话，也会进行相应提示
+    try {
+      //换成封装后的方法
+      let res = await post("/api/login", {
+        username: data.username,
+        password: data.password,
+      });
+      if (res?.error === "0") {
+        // 登录之后进行路由跳转
+        console.log(res);
+        data.toastMessage = "";
+        localStorage.isLogin = true;
+        router.push({ name: "Home" });
+        // alert("success");
+        // router.push({ name: "Home" });
+      } else {
+        showToast("登录失败");
+        // alert("reuquest  error");
+      }
+    } catch {
+      showToast("请求失败");
+    }
+  };
+  const { username, password } = toRefs(data);
+  return { username, password, handleLogin };
+};
 export default {
   name: "Login",
   components: { Toast },
   setup() {
-    //用户名和密码
-    let data = reactive({
-      username: "",
-      password: "",
-      showToast: false,
-      toastMessage: "",
-    });
     let router = useRouter();
-    // const handleLogin = () => {
-    //   axios
-    //     .post(
-    //       "https://www.fastmock.site/mock/2cc0ab9bf1c2b238c3c674e5be8884fc/api/login",
-    //       {
-    //         username: data.username,
-    //         password: data.password,
-    //       }
-    //     )
-    //     .then((res) => {
-    //       console.log(res);
-    //       alert("success");
-    //       // 登录之后进行路由跳转
-    //       localStorage.isLogin = true;
-    //       router.push({ name: "Home" });
-    //     })
-    //     .then(() => {
-    //       console.log();
-    //     });
-    // };
-    const showToast = (msg) => {
-      data.showToast = true;
-      data.toastMessage = msg;
-      setTimeout(() => {
-        data.showToast = false;
-        data.toastMessage = "";
-      }, 2000);
-    };
+
+    const { show, toastMessage, showToast } = useToastEffect();
+    const { username, password, handleLogin } = useLoginEffect(showToast);
     //使用async ...await语法
-    const handleLogin = async () => {
-      // 加入try...catch，如果报错的话，也会进行相应提示
-      try {
-        // let res = await axios.post(
-        //   "https://www.fastmock.site/mock/2cc0ab9bf1c2b238c3c674e5be8884fc/api/login",
-        //   {
-        //     username: data.username,
-        //     password: data.password,
-        //   }
-        // );
-        //换成封装后的方法
-        let res = await post("111/api/login", {
-          username: data.username,
-          password: data.password,
-        });
-        if (res?.error === "0") {
-          // 登录之后进行路由跳转
-          console.log(res);
-          data.toastMessage = "";
-          localStorage.isLogin = true;
-          router.push({ name: "Home" });
-          // alert("success");
-          // router.push({ name: "Home" });
-        } else {
-          showToast("登录失败");
-          // alert("reuquest  error");
-        }
-      } catch {
-        showToast("请求失败");
-      }
-    };
+
     const handleRegister = () => {
       // 登录之后进行路由跳转
       // localStorage.isLogin = true;
       router.push({ name: "Register" });
     };
+
     return {
       handleLogin,
       handleRegister,
-      data,
+      username,
+      password,
+      show,
+      toastMessage,
     };
   },
 };

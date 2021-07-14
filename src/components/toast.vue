@@ -3,6 +3,21 @@
 </template>
 
 <script>
+import { reactive, toRefs } from "vue";
+// 进行代码拆分
+export const useToastEffect = () => {
+  const toastData = reactive({ show: false, toastMessage: "" });
+  const showToast = (msg) => {
+    toastData.show = true;
+    toastData.toastMessage = msg;
+    setTimeout(() => {
+      toastData.show = false;
+      toastData.toastMessage = "";
+    }, 2000);
+  };
+  const { show, toastMessage } = toRefs(toastData);
+  return { show, toastMessage, showToast };
+};
 export default {
   props: ["message"],
 };

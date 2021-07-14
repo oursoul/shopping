@@ -1,18 +1,21 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import Home from "../views/home/Home";
-import Login from "../views/login/Login";
-import Register from "../views/register/Register";
+// import Home from "../views/home/Home";
+// import Login from "../views/login/Login";
+// import Shop from "../views/login/Shop";
+// import Register from "../views/register/Register";
 
 const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home
+    component: () =>
+      import(/* webpackChunkName: "home-007" */ "../views/home/Home")
   },
   {
     path: "/login",
     name: "Login",
-    component: Login,
+    component: () =>
+      import(/* webpackChunkName: "login-007" */ "../views/login/Login"),
     beforeEnter(to, from, next) {
       //登录状态访问login页面，跳转到home页面
       let { isLogin } = localStorage;
@@ -22,7 +25,18 @@ const routes = [
   {
     path: "/register",
     name: "Register",
-    component: Register
+    // 异步路由
+    component: () =>
+      import(
+        /* webpackChunkName: "register-007" */ "../views/register/Register"
+      )
+  },
+  {
+    // 路由传参
+    path: "/shop/:id",
+    name: "Shop",
+    component: () =>
+      import(/* webpackChunkName: "shop-007" */ "../views/shop/Shop")
   }
   // {
   //   path: '/about',
